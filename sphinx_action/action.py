@@ -134,7 +134,7 @@ def build_docs(build_command, docs_directory):
 
         try:
             complete = subprocess.run(
-                [build_command, shlex.split(sphinx_options)],
+                build_command,
                 cwd=docs_directory,
                 capture_output=True,
                 check=True
@@ -146,7 +146,7 @@ def build_docs(build_command, docs_directory):
             print(e)
             raise subprocess.CalledProcessError(
                 -20,
-                [build_command] + shlex.split(sphinx_options)
+                build_command
             )
 
     return complete, annotations
