@@ -134,15 +134,20 @@ def build_docs(build_command, docs_directory):
 
         try:
             complete = subprocess.run(
-                build_command + shlex.split(sphinx_options), cwd=docs_directory,
+                [build_command, shlex.split(sphinx_options)],
+                cwd=docs_directory,
                 capture_output=True,
                 check=True
             )
 
             annotations = parse_sphinx_warnings_log(complete.stderr)
 
-        except subprocess.CalledProcessError as cpe:
-            print(cpe)
+        except Exception as e:
+            print(e)
+            raise subprocess.CalledProcessError(
+                -20,
+                [build_command] + shlex.split(sphinx_options)
+            )
 
     return complete, annotations
 
@@ -160,13 +165,13 @@ def build_all_docs(github_env, docs_directories):
 
         complete, annotations = build_docs(github_env.build_command, docs_dir)
 
-        if complete.returncode != 0:
+        if complete and complete.returncode != 0:
             build_success = False
 
-        warnings += len(complete.stderr)
+            warnings += len(complete.stderr)
 
-        for annotation in annotations:
-            status_check.output_annotation(annotation)
+            for annotation in annotations:
+                status_check.output_annotation(annotation)
 
     status_message = "[sphinx-action] Build {} with {} warnings".format(
         "succeeded" if build_success else "failed", warnings
