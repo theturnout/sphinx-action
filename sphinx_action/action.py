@@ -4,11 +4,9 @@ import tempfile
 import os
 import shlex
 
-from sphinx_action import status_check
-
+import status_check
 
 GithubEnvironment = collections.namedtuple("GithubEnvironment", ["build_command"])
-
 
 def extract_line_information(line_information):
     r"""Lines from sphinx log files look like this
@@ -46,7 +44,6 @@ def extract_line_information(line_information):
 
     file_name = os.path.relpath(file_and_line[0])
     return file_name, line_num
-
 
 def parse_sphinx_warnings_log(logs):
     """Parses a sphinx file containing warnings and errors into a list of
@@ -104,16 +101,22 @@ def build_docs(build_command, docs_directory):
         subprocess.check_call(["pip", "install", "-r", docs_requirements])
 
     log_file = os.path.join(tempfile.gettempdir(), "sphinx-log")
+
     if os.path.exists(log_file):
+        print('Deleting {}...'.format(log_file))
         os.unlink(log_file)
 
-    sphinx_options = '--keep-going --no-color -w "{}"'.format(log_file)
+    # sphinx_options = '--keep-going --no-color -w "{}"'.format(log_file)
+    sphinx_options = '--keep-going --no-color'
+
     # If we're using make, pass the options as part of the SPHINXOPTS
     # environment variable, otherwise pass them straight into the command.
     build_command = shlex.split(build_command)
+
     if build_command[0] == "make":
-        # Pass the -e option into `make`, this is specified to be
-        #   Cause environment variables, including those with null values, to override macro assignments within makefiles.
+        # Pass the -e option into `make`, this is specified to because
+        # environment variables, including those with null values,
+        # to override macro assignments within makefiles.
         # which is exactly what we want.
         build_command += ["-e"]
         print("[sphinx-action] Running: {}".format(build_command))
@@ -131,8 +134,10 @@ def build_docs(build_command, docs_directory):
             build_command + shlex.split(sphinx_options), cwd=docs_directory
         )
 
-    with open(log_file, "r") as f:
-        annotations = parse_sphinx_warnings_log(f.readlines())
+    annotations = []
+
+    # with open(log_file, "r") as f:
+    #     annotations = parse_sphinx_warnings_log(f.readlines())
 
     return return_code, annotations
 
