@@ -4,7 +4,7 @@ import tempfile
 import os
 import shlex
 
-import status_check
+from sphinx_action import status_check
 
 GithubEnvironment = collections.namedtuple("GithubEnvironment", ["build_command"])
 
