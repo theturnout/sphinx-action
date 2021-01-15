@@ -1,8 +1,8 @@
 import collections
-import subprocess
 import tempfile
 import os
 import shlex
+import subprocess
 
 from sphinx_action import status_check
 
@@ -121,26 +121,30 @@ def build_docs(build_command, docs_directory):
         build_command += ["-e"]
         print("[sphinx-action] Running: {}".format(build_command))
 
-        return_code = subprocess.call(
+        complete = subprocess.run(
             build_command,
             env=dict(os.environ, SPHINXOPTS=sphinx_options),
             cwd=docs_directory,
+            capture_output=True,
+            check=True
         )
     else:
         build_command += shlex.split(sphinx_options)
         print("[sphinx-action] Running: {}".format(build_command))
 
-        return_code = subprocess.call(
-            build_command + shlex.split(sphinx_options), cwd=docs_directory
-        )
+        try:
+            complete = subprocess.run(
+                build_command + shlex.split(sphinx_options), cwd=docs_directory,
+                capture_output=True,
+                check=True
+            )
 
-    annotations = []
+            annotations = parse_sphinx_warnings_log(complete.stderr)
 
-    # with open(log_file, "r") as f:
-    #     annotations = parse_sphinx_warnings_log(f.readlines())
+        except subprocess.CalledProcessError as cpe:
+            print(cpe)
 
-    return return_code, annotations
-
+    return complete, annotations
 
 def build_all_docs(github_env, docs_directories):
     if len(docs_directories) == 0:
@@ -154,11 +158,12 @@ def build_all_docs(github_env, docs_directories):
         print("Building docs in {}".format(docs_dir))
         print("====================================")
 
-        return_code, annotations = build_docs(github_env.build_command, docs_dir)
-        if return_code != 0:
+        complete, annotations = build_docs(github_env.build_command, docs_dir)
+
+        if complete.returncode != 0:
             build_success = False
 
-        warnings += len(annotations)
+        warnings += len(complete.stderr)
 
         for annotation in annotations:
             status_check.output_annotation(annotation)
@@ -166,6 +171,7 @@ def build_all_docs(github_env, docs_directories):
     status_message = "[sphinx-action] Build {} with {} warnings".format(
         "succeeded" if build_success else "failed", warnings
     )
+
     print(status_message)
 
     if not build_success:
