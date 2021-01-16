@@ -6,7 +6,7 @@ ADD entrypoint.py /entrypoint.py
 ADD sphinx_action /sphinx_action
 
 RUN pip install pipenv && \
-    $(python -m site --user-base)/bin pipenv install --system --deploy --ignore-pipfile && \
+    pipenv install --system --deploy --ignore-pipfile && \
     pipenv shell
 
 ENTRYPOINT ["/entrypoint.py"]
