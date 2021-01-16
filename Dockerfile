@@ -7,4 +7,4 @@ ADD sphinx_action /sphinx_action
 
 RUN pip install pipenv
 
-ENTRYPOINT ["/entrypoint.py"]
+ENTRYPOINT ["/entrypoint.sh"]
