@@ -5,8 +5,6 @@ LABEL "maintainer"="Ammar Askar <ammar@ammaraskar.com>"
 ADD entrypoint.py /entrypoint.py
 ADD sphinx_action /sphinx_action
 
-RUN pip install pipenv && \
-    pipenv install --system --deploy --ignore-pipfile && \
-    pipenv shell
+RUN pip install pipenv
 
 ENTRYPOINT ["/entrypoint.py"]
