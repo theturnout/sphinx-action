@@ -5,7 +5,7 @@ LABEL "maintainer"="Ammar Askar <ammar@ammaraskar.com>"
 ADD entrypoint.py /entrypoint.py
 ADD sphinx_action /sphinx_action
 
-RUN pipx install pipenv && \
+RUN pip install --user pipx && pipx install pipenv && \
     pipenv install --system --deploy --ignore-pipfile && \
     pipenv shell
 
