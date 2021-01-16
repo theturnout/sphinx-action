@@ -142,12 +142,9 @@ def build_docs(build_command, docs_directory):
 
             annotations = parse_sphinx_warnings_log(complete.stderr)
 
-        except Exception as e:
-            print(e)
-            raise subprocess.CalledProcessError(
-                -20,
-                build_command
-            )
+        except subprocess.CalledProcessError as e:
+            print(e.cmd, e.returncode, e.output, e.stdout, e.stderr)
+            raise e
 
     return complete, annotations
 
