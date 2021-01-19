@@ -20,6 +20,7 @@ def extract_line_information(line_information):
         /home/users/ammar/workspace/sphix-action/tests/test_projects/warnings/index.rst: Something went wrong with this whole ifle
 
     This method is responsible for parsing out the line number and file name from these lines.
+
     """
     file_and_line = line_information.split(":")
     # This is a dirty windows specific hack to deal with drive letters in the
@@ -32,6 +33,7 @@ def extract_line_information(line_information):
 
     if len(file_and_line) != 2 and len(file_and_line) != 3:
         return None
+
     # The case where we have no line number, in this case we return the line
     # number as 1 to mark the whole file.
     if len(file_and_line) == 2:
@@ -66,14 +68,16 @@ maximum 1 argument(s) allowed, 2 supplied.
         warning_tokens = line.split("WARNING:")
         if len(warning_tokens) != 2:
             continue
-        file_and_line, message = warning_tokens
 
+        file_and_line, message = warning_tokens
         file_and_line = extract_line_information(file_and_line)
+
         if not file_and_line:
             continue
-        file_name, line_number = file_and_line
 
+        file_name, line_number = file_and_line
         warning_message = message
+
         # If this isn't the last line and the next line isn't a warning,
         # treat it as part of this warning message.
         if (i != len(logs) - 1) and "WARNING" not in logs[i + 1]:
@@ -138,17 +142,18 @@ def build_docs(build_command, docs_directory):
                 build_command,
                 cwd=docs_directory,
                 capture_output=True,
-                check=True
+                check=True,
+                text=True
             )
 
-            #annotations = parse_sphinx_warnings_log(complete.stderr)
+            annotations = parse_sphinx_warnings_log(complete.stdout)
             print(complete.stderr, complete.stdout)
 
         except subprocess.CalledProcessError as e:
             print(e.cmd, e.returncode, e.output, e.stdout, e.stderr)
             raise e
 
-    return complete, []#annotations
+    return complete, annotations
 
 def build_all_docs(github_env, docs_directories):
     if len(docs_directories) == 0:
