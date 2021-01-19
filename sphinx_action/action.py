@@ -141,13 +141,14 @@ def build_docs(build_command, docs_directory):
                 check=True
             )
 
-            annotations = parse_sphinx_warnings_log(complete.stderr)
+            #annotations = parse_sphinx_warnings_log(complete.stderr)
+            print(complete.stderr, complete.stdout)
 
         except subprocess.CalledProcessError as e:
             print(e.cmd, e.returncode, e.output, e.stdout, e.stderr)
             raise e
 
-    return complete, annotations
+    return complete, []#annotations
 
 def build_all_docs(github_env, docs_directories):
     if len(docs_directories) == 0:
