@@ -59,6 +59,7 @@ maximum 1 argument(s) allowed, 2 supplied.
     annotations = []
 
     for i, line in enumerate(logs):
+        print(i, line)
         if "WARNING" not in line:
             continue
 
